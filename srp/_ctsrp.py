@@ -23,6 +23,11 @@ import time
 import six
 
 
+_rfc5054_compat = False
+
+def rfc5054_enable(enable=True):
+    _rfc5054_compat = enable
+
 
 SHA1   = 0
 SHA224 = 1
@@ -251,9 +256,11 @@ def H_bn_bn( hash_class, dest, n1, n2, width ):
     bin2 = ctypes.create_string_buffer( BN_num_bytes(n2) )
     BN_bn2bin(n1, bin1)
     BN_bn2bin(n2, bin2)
-    h.update(bytes(width - len(bin1.raw)))
+    if _rfc5054_compat:
+        h.update(bytes(width - len(bin1.raw)))
     h.update( bin1.raw )
-    h.update(bytes(width - len(bin2.raw)))
+    if _rfc5054_compat:
+        h.update(bytes(width - len(bin2.raw)))
     h.update( bin2.raw )
     d = h.digest()
     BN_bin2bn(d, len(d), dest)
@@ -322,7 +329,8 @@ def get_ngk( hash_class, ng_type, n_hex, g_hex, ctx ):
     BN_hex2bn( N, n_hex )
     BN_hex2bn( g, g_hex )
     H_bn_bn(hash_class, k, N, g, width=BN_num_bytes(N))
-    BN_mod(k, k, N, ctx)
+    if _rfc5054_compat:
+        BN_mod(k, k, N, ctx)
 
     return N, g, k
 

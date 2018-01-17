@@ -18,6 +18,13 @@ import os
 import binascii
 import six
 
+
+_rfc5054_compat = False
+
+def rfc5054_enable(enable=True):
+    _rfc5054_compat = enable
+
+
 SHA1   = 0
 SHA224 = 1
 SHA256 = 2
@@ -171,7 +178,7 @@ def H( hash_class, *args, width=None, **kwargs ):
     for s in args:
         if s is not None:
             data = long_to_bytes(s) if isinstance(s, six.integer_types) else s
-            if width is not None:
+            if width is not None and _rfc5054_compat:
                 h.update( bytes(width - len(data)))
             h.update( data )
 
