@@ -22,6 +22,7 @@ import six
 _rfc5054_compat = False
 
 def rfc5054_enable(enable=True):
+    global _rfc5054_compat
     _rfc5054_compat = enable
 
 
